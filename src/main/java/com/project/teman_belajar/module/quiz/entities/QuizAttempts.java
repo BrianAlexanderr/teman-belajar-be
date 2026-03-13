@@ -15,6 +15,7 @@ import java.util.Date;
 public class QuizAttempts {
 
     @Id
+    @GeneratedValue
     private Integer id;
 
     private String displayId;

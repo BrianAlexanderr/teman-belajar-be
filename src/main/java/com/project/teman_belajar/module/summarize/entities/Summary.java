@@ -15,6 +15,7 @@ import java.util.Date;
 public class Summary {
 
     @Id
+    @GeneratedValue
     private Integer id;
 
     private String displayId;
