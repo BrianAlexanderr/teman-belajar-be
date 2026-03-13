@@ -1,6 +1,7 @@
 package com.project.teman_belajar.module.materials.entities;
 
 import com.project.teman_belajar.module.extract.entities.ExtractedText;
+import com.project.teman_belajar.module.folder.entities.Folders;
 import com.project.teman_belajar.module.users.entities.Users;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -16,6 +17,7 @@ import java.util.Date;
 public class Materials {
 
     @Id
+    @GeneratedValue
     private Integer id;
 
     private String displayId;
@@ -27,8 +29,8 @@ public class Materials {
     private Date createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private Users user;
+    @JoinColumn(name = "folders_id")
+    private Folders folders;
 
     @OneToOne(mappedBy = "extracted_text")
     private ExtractedText extractedText;

@@ -1,5 +1,6 @@
 package com.project.teman_belajar.module.users.entities;
 
+import com.project.teman_belajar.module.folder.entities.Folders;
 import com.project.teman_belajar.module.materials.entities.Materials;
 import com.project.teman_belajar.module.quiz.entities.QuizAttempts;
 import jakarta.persistence.*;
@@ -16,6 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 public class Users {
     @Id
+    @GeneratedValue
     private Integer id;
 
     private String displayId;
@@ -31,7 +33,7 @@ public class Users {
     private Date createdAt;
 
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Materials> materialList;
+    private List<Folders> foldersList;
 
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QuizAttempts> quizAttemptsList;
