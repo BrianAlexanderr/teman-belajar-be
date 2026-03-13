@@ -17,6 +17,7 @@ import java.util.Date;
 public class ExtractedText {
 
     @Id
+    @GeneratedValue
     private Integer id;
 
     private String displayId;

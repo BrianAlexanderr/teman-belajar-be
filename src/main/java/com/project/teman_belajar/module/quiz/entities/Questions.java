@@ -12,6 +12,7 @@ import lombok.Setter;
 public class Questions {
 
 	@Id
+	@GeneratedValue
 	private Integer id;
 
 	private String displayId;

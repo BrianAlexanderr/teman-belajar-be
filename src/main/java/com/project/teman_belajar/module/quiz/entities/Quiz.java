@@ -16,6 +16,7 @@ import java.util.List;
 public class Quiz {
 
     @Id
+    @GeneratedValue
     private Integer id;
 
     private String displayId;
