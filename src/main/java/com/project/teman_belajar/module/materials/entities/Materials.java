@@ -2,7 +2,6 @@ package com.project.teman_belajar.module.materials.entities;
 
 import com.project.teman_belajar.module.extract.entities.ExtractedText;
 import com.project.teman_belajar.module.folder.entities.Folders;
-import com.project.teman_belajar.module.users.entities.Users;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,7 +1,6 @@
 package com.project.teman_belajar.module.users.entities;
 
 import com.project.teman_belajar.module.folder.entities.Folders;
-import com.project.teman_belajar.module.materials.entities.Materials;
 import com.project.teman_belajar.module.quiz.entities.QuizAttempts;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -46,7 +45,7 @@ public class Users implements UserDetails {
     private List<QuizAttempts> quizAttemptsList;
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
+    public @NullMarked Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
