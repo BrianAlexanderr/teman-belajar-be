@@ -20,8 +20,6 @@ public class Folders {
     @GeneratedValue
     private Integer id;
 
-    private String displayId;
-
     private String name;
 
     private Date createdAt;

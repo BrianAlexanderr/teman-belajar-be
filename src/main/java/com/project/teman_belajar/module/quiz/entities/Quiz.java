@@ -19,8 +19,6 @@ public class Quiz {
     @GeneratedValue
     private Integer id;
 
-    private String displayId;
-
     private String title;
 
     private Date createdAt;

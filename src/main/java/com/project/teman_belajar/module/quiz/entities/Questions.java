@@ -15,8 +15,6 @@ public class Questions {
 	@GeneratedValue
 	private Integer id;
 
-	private String displayId;
-
 	private String question_text;
 
 	private String answer_a;

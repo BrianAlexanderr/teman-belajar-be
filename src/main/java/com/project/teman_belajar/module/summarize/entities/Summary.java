@@ -18,8 +18,6 @@ public class Summary {
     @GeneratedValue
     private Integer id;
 
-    private String displayId;
-
     private String text;
 
     private String name;

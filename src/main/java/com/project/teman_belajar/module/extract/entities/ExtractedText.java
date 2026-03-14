@@ -20,8 +20,6 @@ public class ExtractedText {
     @GeneratedValue
     private Integer id;
 
-    private String displayId;
-
     private String name;
 
     private String text;
