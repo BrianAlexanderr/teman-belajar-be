@@ -2,7 +2,6 @@ package com.project.teman_belajar.common.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.teman_belajar.common.global_exception.dto.ErrorResponse;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jspecify.annotations.NonNull;
@@ -41,11 +40,11 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         String errorMessage = "Anda tidak memiliki kredential atau token tidak valid.";
 
         switch (authException) {
-            case org.springframework.security.authentication.BadCredentialsException badCredentialsException ->
+            case org.springframework.security.authentication.BadCredentialsException _ ->
                     errorMessage = "Email atau password salah.";
-            case org.springframework.security.authentication.DisabledException disabledException ->
+            case org.springframework.security.authentication.DisabledException _ ->
                     errorMessage = "Akun Anda belum diaktivasi. Silakan cek email Anda.";
-            case org.springframework.security.authentication.LockedException lockedException ->
+            case org.springframework.security.authentication.LockedException _ ->
                     errorMessage = "Akun Anda terkunci karena terlalu banyak percobaan gagal.";
             default -> {
             }
