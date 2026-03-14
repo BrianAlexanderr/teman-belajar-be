@@ -1,4 +1,4 @@
-package com.project.teman_belajar.configuration;
+package com.project.teman_belajar.common.configuration;
 
 import com.project.teman_belajar.module.auth.service.JwtService;
 import jakarta.servlet.FilterChain;

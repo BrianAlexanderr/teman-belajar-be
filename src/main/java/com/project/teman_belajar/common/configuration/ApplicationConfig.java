@@ -1,6 +1,6 @@
-package com.project.teman_belajar.configuration;
+package com.project.teman_belajar.common.configuration;
 
-import com.project.teman_belajar.module.users.repository.UserRepository;
+import com.project.teman_belajar.module.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
