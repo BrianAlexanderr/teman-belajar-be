@@ -1,6 +1,6 @@
-package com.project.teman_belajar.module.users.repository;
+package com.project.teman_belajar.module.auth.repository;
 
-import com.project.teman_belajar.module.users.entities.Users;
+import com.project.teman_belajar.module.auth.entities.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package com.project.teman_belajar.module.users.entities;
+package com.project.teman_belajar.module.auth.entities;
 
 import com.project.teman_belajar.module.folder.entities.Folders;
 import com.project.teman_belajar.module.quiz.entities.QuizAttempts;
