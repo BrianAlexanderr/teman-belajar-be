@@ -20,7 +20,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public void commence(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull AuthenticationException authException) throws IOException, ServletException {
+    public void commence(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull AuthenticationException authException) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
 
@@ -40,12 +40,15 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     private static @NonNull String getString(@NonNull AuthenticationException authException) {
         String errorMessage = "Anda tidak memiliki kredential atau token tidak valid.";
 
-        if (authException instanceof org.springframework.security.authentication.BadCredentialsException) {
-            errorMessage = "Email atau password salah.";
-        } else if (authException instanceof org.springframework.security.authentication.DisabledException) {
-            errorMessage = "Akun Anda belum diaktivasi. Silakan cek email Anda.";
-        } else if (authException instanceof org.springframework.security.authentication.LockedException) {
-            errorMessage = "Akun Anda terkunci karena terlalu banyak percobaan gagal.";
+        switch (authException) {
+            case org.springframework.security.authentication.BadCredentialsException badCredentialsException ->
+                    errorMessage = "Email atau password salah.";
+            case org.springframework.security.authentication.DisabledException disabledException ->
+                    errorMessage = "Akun Anda belum diaktivasi. Silakan cek email Anda.";
+            case org.springframework.security.authentication.LockedException lockedException ->
+                    errorMessage = "Akun Anda terkunci karena terlalu banyak percobaan gagal.";
+            default -> {
+            }
         }
         return errorMessage;
     }
