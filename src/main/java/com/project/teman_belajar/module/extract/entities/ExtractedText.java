@@ -32,10 +32,10 @@ public class ExtractedText {
     @JoinColumn(name = "materials_id")
     private Materials materials;
 
-    @OneToOne(mappedBy = "extracted_text", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "extractedText", cascade = CascadeType.ALL, orphanRemoval = true)
     private Quiz quiz;
 
-    @OneToOne(mappedBy = "extracted_text", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "extractedText", cascade = CascadeType.ALL, orphanRemoval = true)
     private Summary summary;
 
 }

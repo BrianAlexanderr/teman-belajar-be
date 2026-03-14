@@ -32,6 +32,6 @@ public class Materials {
     @JoinColumn(name = "folders_id")
     private Folders folders;
 
-    @OneToOne(mappedBy = "extracted_text")
+    @OneToOne(mappedBy = "materials")
     private ExtractedText extractedText;
 }

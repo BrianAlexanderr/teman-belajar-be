@@ -32,7 +32,7 @@ public class Quiz {
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Questions> questionsList;
 
-    @OneToMany(mappedBy = "quiz_attempts", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QuizAttempts> quizAttemptsList;
 }
 
