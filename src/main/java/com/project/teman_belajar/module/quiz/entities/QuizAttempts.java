@@ -18,8 +18,6 @@ public class QuizAttempts {
     @GeneratedValue
     private Integer id;
 
-    private String displayId;
-
     private Integer score;
 
     private Date attemptAt;

@@ -2,7 +2,6 @@ package com.project.teman_belajar.module.materials.entities;
 
 import com.project.teman_belajar.module.extract.entities.ExtractedText;
 import com.project.teman_belajar.module.folder.entities.Folders;
-import com.project.teman_belajar.module.users.entities.Users;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,8 +19,6 @@ public class Materials {
     @GeneratedValue
     private Integer id;
 
-    private String displayId;
-
     private String name;
 
     private String url;
@@ -32,6 +29,6 @@ public class Materials {
     @JoinColumn(name = "folders_id")
     private Folders folders;
 
-    @OneToOne(mappedBy = "extracted_text")
+    @OneToOne(mappedBy = "materials")
     private ExtractedText extractedText;
 }

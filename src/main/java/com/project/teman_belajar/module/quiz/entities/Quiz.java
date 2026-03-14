@@ -19,8 +19,6 @@ public class Quiz {
     @GeneratedValue
     private Integer id;
 
-    private String displayId;
-
     private String title;
 
     private Date createdAt;
@@ -32,7 +30,7 @@ public class Quiz {
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Questions> questionsList;
 
-    @OneToMany(mappedBy = "quiz_attempts", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QuizAttempts> quizAttemptsList;
 }
 
