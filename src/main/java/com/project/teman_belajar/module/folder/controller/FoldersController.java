@@ -12,6 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/folders")
@@ -31,7 +32,7 @@ public class FoldersController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserFolderResponse> getFolderById(@PathVariable Integer id){
+    public ResponseEntity<UserFolderResponse> getFolderById(@PathVariable UUID id){
         return foldersService.findFolderById(id);
     }
 }

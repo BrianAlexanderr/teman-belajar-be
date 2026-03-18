@@ -6,9 +6,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface FoldersRepository extends JpaRepository<Folders, Integer> {
-    Optional<List<Folders>> findByUserId(Integer id);
-    Optional<Folders> findByNameAndUserId(String name, Integer id);
+public interface FoldersRepository extends JpaRepository<Folders, UUID> {
+    Optional<List<Folders>> findByUserId(UUID user_id);
+    Optional<Folders> findByNameAndUserId(String name, UUID user_id);
 }

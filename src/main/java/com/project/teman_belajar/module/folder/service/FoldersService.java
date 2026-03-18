@@ -26,7 +26,7 @@ import java.util.*;
 public class FoldersService {
     private final FoldersRepository foldersRepository;
 
-    public ResponseEntity<List<UserFolderResponse>> getUserFolders(Integer id){
+    public ResponseEntity<List<UserFolderResponse>> getUserFolders(UUID id){
         Optional<List<Folders>> userFolder =  foldersRepository.findByUserId(id);
         if(userFolder.isEmpty()) throw new UserNotFoundException("User not found!");
 
@@ -69,7 +69,7 @@ public class FoldersService {
         return ResponseEntity.created(location).body(response);
     }
 
-    public ResponseEntity<UserFolderResponse> findFolderById(Integer id){
+    public ResponseEntity<UserFolderResponse> findFolderById(UUID id){
         Optional<Folders> folders = foldersRepository.findById(id);
 
         if(folders.isEmpty()) throw new FolderNotFoundException("Folder of id " + id + " not found!");

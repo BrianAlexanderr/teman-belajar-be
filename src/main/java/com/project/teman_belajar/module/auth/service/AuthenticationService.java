@@ -3,6 +3,7 @@ package com.project.teman_belajar.module.auth.service;
 import com.project.teman_belajar.module.auth.dto.request.AuthenticationRequest;
 import com.project.teman_belajar.module.auth.dto.request.RegisterRequest;
 import com.project.teman_belajar.module.auth.dto.response.AuthenticationResponse;
+import com.project.teman_belajar.module.auth.entities.RefreshToken;
 import com.project.teman_belajar.module.auth.entities.Role;
 import com.project.teman_belajar.module.auth.entities.Users;
 import com.project.teman_belajar.module.auth.repository.UserRepository;
@@ -22,6 +23,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final RefreshTokenService refreshTokenService;
 
     public AuthenticationResponse register(RegisterRequest request) {
         Users user = new Users();
@@ -35,9 +37,11 @@ public class AuthenticationService {
 
         userRepository.save(user);
 
-        String jwtToken = jwtService.generateToken(user);
+        String jwtToken = jwtService.generateAccessToken(user);
 
-        return new AuthenticationResponse(jwtToken);
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
+
+        return new AuthenticationResponse(jwtToken, refreshToken.getToken());
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
@@ -52,8 +56,10 @@ public class AuthenticationService {
         Users user = userRepository.findByEmail(request.email())
                 .orElseThrow();
 
-        String jwtToken = jwtService.generateToken(user);
+        String jwtToken = jwtService.generateAccessToken(user);
 
-        return new AuthenticationResponse(jwtToken);
+        RefreshToken refreshToken = refreshTokenService.getOrCreateRefreshToken(user.getId());
+
+        return new AuthenticationResponse(jwtToken,  refreshToken.getToken());
     }
 }

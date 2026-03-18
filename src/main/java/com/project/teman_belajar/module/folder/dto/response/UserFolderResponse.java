@@ -1,6 +1,8 @@
 package com.project.teman_belajar.module.folder.dto.response;
 
+import java.util.UUID;
+
 public record UserFolderResponse(
-    Integer id,
+    UUID id,
     String name
 ){}

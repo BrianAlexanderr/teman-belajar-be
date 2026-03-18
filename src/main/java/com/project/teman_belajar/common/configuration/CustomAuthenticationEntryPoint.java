@@ -5,6 +5,7 @@ import com.project.teman_belajar.common.global_exception.dto.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jspecify.annotations.NonNull;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -37,18 +38,14 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     }
 
     private static @NonNull String getString(@NonNull AuthenticationException authException) {
-        String errorMessage = "Anda tidak memiliki kredential atau token tidak valid.";
+        String errorMessage;
 
-        switch (authException) {
-            case org.springframework.security.authentication.BadCredentialsException _ ->
-                    errorMessage = "Email atau password salah.";
-            case org.springframework.security.authentication.DisabledException _ ->
-                    errorMessage = "Akun Anda belum diaktivasi. Silakan cek email Anda.";
-            case org.springframework.security.authentication.LockedException _ ->
-                    errorMessage = "Akun Anda terkunci karena terlalu banyak percobaan gagal.";
-            default -> {
-            }
+        if (authException instanceof BadCredentialsException) {
+            errorMessage = "Email atau password salah.";
+        } else {
+            errorMessage = "Anda tidak memiliki kredential atau token tidak valid.";
         }
+
         return errorMessage;
     }
 }

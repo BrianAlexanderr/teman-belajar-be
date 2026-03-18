@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Entity
 @Getter
 @Setter
@@ -12,17 +14,17 @@ import lombok.Setter;
 public class Questions {
 
 	@Id
-	@GeneratedValue
-	private Integer id;
+	@GeneratedValue(strategy = GenerationType.UUID)
+	private UUID id;
 
 	private String question_text;
 
-	private String answer_a;
-	private String answer_b;
-	private String answer_c;
-	private String answer_d;
+	private String answerA;
+	private String answerB;
+	private String answerC;
+	private String answerD;
 
-	private String correct_answer;
+	private String correctAnswer;
 
 	private String explanation;
 
