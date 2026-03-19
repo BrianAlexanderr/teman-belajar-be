@@ -34,7 +34,7 @@ public class FoldersService {
 
         for(Folders folder: userFolder.get()){
             UserFolderResponse response = new UserFolderResponse(
-                folder.getUser().getId(),
+                folder.getId(),
                 folder.getName()
             );
             responses.add(response);
@@ -80,5 +80,15 @@ public class FoldersService {
         );
 
         return ResponseEntity.ok(response);
+    }
+
+    public ResponseEntity<Void> deleteFolderById(UUID folderId){
+        Optional<Folders> folder = foldersRepository.findById(folderId);
+
+        if(folder.isEmpty()) throw new FolderNotFoundException("Folder of id " + folderId + " not found!");
+
+        foldersRepository.delete(folder.get());
+
+        return ResponseEntity.noContent().build();
     }
 }
