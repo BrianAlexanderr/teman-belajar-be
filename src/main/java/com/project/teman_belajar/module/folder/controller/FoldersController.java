@@ -35,4 +35,9 @@ public class FoldersController {
     public ResponseEntity<UserFolderResponse> getFolderById(@PathVariable UUID id){
         return foldersService.findFolderById(id);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteFolderById(@PathVariable UUID id){
+        return foldersService.deleteFolderById(id);
+    }
 }
