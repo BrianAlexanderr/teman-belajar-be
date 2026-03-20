@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -31,4 +32,7 @@ public class Questions {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "quiz_id")
     private Quiz quiz;
+
+	@OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<QuestionAttempt> questionAttemptList;
 }
