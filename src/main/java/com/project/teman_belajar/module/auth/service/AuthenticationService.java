@@ -3,6 +3,7 @@ package com.project.teman_belajar.module.auth.service;
 import com.project.teman_belajar.module.auth.dto.request.AuthenticationRequest;
 import com.project.teman_belajar.module.auth.dto.request.RegisterRequest;
 import com.project.teman_belajar.module.auth.dto.response.AuthenticationResponse;
+import com.project.teman_belajar.module.auth.dto.response.RegisterSuccessResponse;
 import com.project.teman_belajar.module.auth.entities.RefreshToken;
 import com.project.teman_belajar.module.auth.entities.Role;
 import com.project.teman_belajar.module.auth.entities.Users;
@@ -25,7 +26,7 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenService refreshTokenService;
 
-    public AuthenticationResponse register(RegisterRequest request) {
+    public RegisterSuccessResponse register(RegisterRequest request) {
         Users user = new Users();
 
         user.setName(request.firstName() + ' ' + request.lastName());
@@ -37,11 +38,9 @@ public class AuthenticationService {
 
         userRepository.save(user);
 
-        String jwtToken = jwtService.generateAccessToken(user);
+        refreshTokenService.createRefreshToken(user.getId());
 
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
-
-        return new AuthenticationResponse(jwtToken, refreshToken.getToken());
+        return new RegisterSuccessResponse("Success", new Date());
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
