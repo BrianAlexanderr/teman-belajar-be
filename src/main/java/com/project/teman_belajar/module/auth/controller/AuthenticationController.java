@@ -6,6 +6,7 @@ import com.project.teman_belajar.module.auth.dto.request.RefreshTokenRequest;
 import com.project.teman_belajar.module.auth.dto.request.RegisterRequest;
 import com.project.teman_belajar.module.auth.dto.response.AuthenticationResponse;
 import com.project.teman_belajar.module.auth.dto.response.DeleteRefreshTokenResponse;
+import com.project.teman_belajar.module.auth.dto.response.RegisterSuccessResponse;
 import com.project.teman_belajar.module.auth.service.AuthenticationService;
 import com.project.teman_belajar.module.auth.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class AuthenticationController {
     private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(
+    public ResponseEntity<RegisterSuccessResponse> register(
             @RequestBody RegisterRequest request
     ){
         return ResponseEntity.ok(authenticationService.register(request));
