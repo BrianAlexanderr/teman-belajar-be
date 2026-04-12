@@ -5,6 +5,7 @@ import com.project.teman_belajar.module.auth.dto.response.AuthenticationResponse
 import com.project.teman_belajar.module.auth.dto.response.DeleteRefreshTokenResponse;
 import com.project.teman_belajar.module.auth.entities.RefreshToken;
 import com.project.teman_belajar.module.auth.entities.Users;
+import com.project.teman_belajar.module.auth.exception.custom_exception.RefreshTokenNotFoundException;
 import com.project.teman_belajar.module.auth.exception.custom_exception.TokenExpiredException;
 import com.project.teman_belajar.module.auth.exception.custom_exception.TokenRefreshException;
 import com.project.teman_belajar.module.auth.exception.custom_exception.UserNotFoundException;
@@ -25,6 +26,7 @@ import java.util.UUID;
 public class RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
+    private final TokenDeleteService tokenDeleteService;
     private final UserRepository userRepository;
     private final JwtService jwtService;
 
@@ -48,26 +50,23 @@ public class RefreshTokenService {
         return refreshTokenRepository.findByToken(token);
     }
 
-    private void deleteRefreshToken(UUID id){
-        if(!userRepository.existsById(id)){
-            throw new UserNotFoundException("User not found");
-        }
-
-        refreshTokenRepository.deleteByUserId(id);
-    }
-
-    public RefreshToken verifyExpiration(RefreshToken refreshToken, UUID userId) {
+    public RefreshToken verifyExpiration(RefreshToken refreshToken) {
         if(refreshToken.getExpiryDate().compareTo(Instant.now()) < 0){
-            deleteRefreshToken(userId);
+            tokenDeleteService.deleteRefreshToken(refreshToken);
             throw new TokenExpiredException("Refresh Token Expired");
         }
         return refreshToken;
     }
 
-
     public ResponseEntity<DeleteRefreshTokenResponse> deleteByUserId(UUID userId) {
 
-        deleteRefreshToken(userId);
+        Optional<RefreshToken> refreshToken = refreshTokenRepository.findByUserId(userId);
+
+        if(refreshToken.isPresent()){
+            tokenDeleteService.deleteRefreshToken(refreshToken.get());
+        }else{
+            throw new UserNotFoundException("User not found");
+        }
 
         DeleteRefreshTokenResponse response = new DeleteRefreshTokenResponse(
                 "Success",
@@ -81,7 +80,7 @@ public class RefreshTokenService {
         String requestRefreshToken = request.token();
 
         return findByToken(requestRefreshToken)
-                .map(token -> verifyExpiration(token, token.getId()))
+                .map(this::verifyExpiration)
                 .map(RefreshToken::getUser)
                 .map(user -> {
                     if (jwtService.validateToken(requestRefreshToken, user)) {
@@ -92,7 +91,7 @@ public class RefreshTokenService {
                     }
                     throw new TokenRefreshException(requestRefreshToken);
                 })
-                .orElseThrow(() -> new RuntimeException("Refresh token is not in database!"));
+                .orElseThrow(() -> new RefreshTokenNotFoundException("Refresh token is not in database!"));
     }
 
     public RefreshToken getOrCreateRefreshToken(UUID id) {
@@ -104,7 +103,7 @@ public class RefreshTokenService {
             if (refreshToken.getExpiryDate().compareTo(Instant.now()) > 0) {
                 return refreshToken;
             } else {
-                deleteRefreshToken(id);
+                tokenDeleteService.deleteRefreshToken(refreshToken);
             }
         }
 
