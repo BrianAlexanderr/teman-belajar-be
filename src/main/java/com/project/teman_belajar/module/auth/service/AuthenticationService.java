@@ -7,6 +7,7 @@ import com.project.teman_belajar.module.auth.dto.response.RegisterSuccessRespons
 import com.project.teman_belajar.module.auth.entities.RefreshToken;
 import com.project.teman_belajar.module.auth.entities.Role;
 import com.project.teman_belajar.module.auth.entities.Users;
+import com.project.teman_belajar.module.auth.exception.custom_exception.DuplicateEmailException;
 import com.project.teman_belajar.module.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +28,17 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenService refreshTokenService;
 
+    private boolean isExist(String email){
+        Optional<Users> user = userRepository.findByEmail(email);
+        return user.isPresent();
+    }
+
     public RegisterSuccessResponse register(RegisterRequest request) {
+
+        if(isExist(request.email())){
+            throw  new DuplicateEmailException("Email yang digunakan telah terdaftar!");
+        }
+
         Users user = new Users();
 
         user.setName(request.firstName() + ' ' + request.lastName());
