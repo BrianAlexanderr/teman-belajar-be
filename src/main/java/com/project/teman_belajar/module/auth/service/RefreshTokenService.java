@@ -12,8 +12,6 @@ import com.project.teman_belajar.module.auth.exception.custom_exception.UserNotF
 import com.project.teman_belajar.module.auth.repository.RefreshTokenRepository;
 import com.project.teman_belajar.module.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -58,7 +56,7 @@ public class RefreshTokenService {
         return refreshToken;
     }
 
-    public ResponseEntity<DeleteRefreshTokenResponse> deleteByUserId(UUID userId) {
+    public DeleteRefreshTokenResponse deleteByUserId(UUID userId) {
 
         Optional<RefreshToken> refreshToken = refreshTokenRepository.findByUserId(userId);
 
@@ -68,12 +66,10 @@ public class RefreshTokenService {
             throw new UserNotFoundException("User not found");
         }
 
-        DeleteRefreshTokenResponse response = new DeleteRefreshTokenResponse(
+        return new DeleteRefreshTokenResponse(
                 "Success",
                 LocalDateTime.now().toString()
         );
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     public AuthenticationResponse generateNewToken(RefreshTokenRequest request) {
