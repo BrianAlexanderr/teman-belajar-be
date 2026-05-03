@@ -1,5 +1,6 @@
 package com.project.teman_belajar.module.auth.service;
 
+import com.project.teman_belajar.module.auth.entities.Users;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -13,6 +14,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 @Service
@@ -34,15 +36,24 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
+    private Long getUserVersion(UserDetails user) {
+        return Optional.ofNullable(user)
+                .filter(Users.class::isInstance)
+                .map(u -> ((Users) u).getVersion())
+                .orElse(0L); // Default to 0 if anything goes wrong
+    }
+
     public String generateAccessToken(UserDetails user){
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("token_type", "ACCESS");
+        extraClaims.put("version",  getUserVersion(user));
         return buildToken(extraClaims, user, JWT_EXPIRATION);
     }
 
     public String generateRefreshToken(UserDetails user){
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("token_type", "REFRESH");
+        extraClaims.put("version",  getUserVersion(user));
         return buildToken(extraClaims, user, REFRESH_EXPIRATION);
     }
 
@@ -65,9 +76,20 @@ public class JwtService {
         return "ACCESS".equals(type);
     }
 
+    private boolean isValidVersion(Long userVersion, Long claimVersion){
+        return userVersion.equals(claimVersion);
+    }
+
     public boolean validateToken(String token, UserDetails userDetails){
         final String email = extractUserEmail(token);
-        return (email.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        final Long userVersion = getUserVersion(userDetails);
+        final Long claimVersion = extractClaim(
+                token,
+                claims -> claims.get("version", Long.class)
+        );
+        return (email.equals(userDetails.getUsername())) &&
+                !isTokenExpired(token) &&
+                isValidVersion(userVersion, claimVersion);
     }
 
     private boolean isTokenExpired(String token) {

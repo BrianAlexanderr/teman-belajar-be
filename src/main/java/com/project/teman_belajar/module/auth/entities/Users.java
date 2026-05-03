@@ -1,11 +1,16 @@
 package com.project.teman_belajar.module.auth.entities;
 
+import com.project.teman_belajar.common.entity.BaseEntity;
 import com.project.teman_belajar.module.folder.entities.Folders;
 import com.project.teman_belajar.module.quiz.entities.QuizAttempts;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,7 +18,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,21 +25,19 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Users implements UserDetails {
+@AllArgsConstructor
+public class Users extends BaseEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     private String name;
 
-
     private String email;
 
     private boolean isSubscribe;
-
+    
     private String passwordHashed;
-
-    private Date createdAt;
 
     @Enumerated(EnumType.STRING)
     private Role role;

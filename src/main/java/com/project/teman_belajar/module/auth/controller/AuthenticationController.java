@@ -1,16 +1,14 @@
 package com.project.teman_belajar.module.auth.controller;
 
-import com.project.teman_belajar.module.auth.dto.request.AuthenticationRequest;
-import com.project.teman_belajar.module.auth.dto.request.LogoutRequest;
-import com.project.teman_belajar.module.auth.dto.request.RefreshTokenRequest;
-import com.project.teman_belajar.module.auth.dto.request.RegisterRequest;
+import com.project.teman_belajar.module.auth.dto.request.*;
 import com.project.teman_belajar.module.auth.dto.response.AuthenticationResponse;
 import com.project.teman_belajar.module.auth.dto.response.DeleteRefreshTokenResponse;
-import com.project.teman_belajar.module.auth.dto.response.RegisterSuccessResponse;
+import com.project.teman_belajar.module.auth.dto.response.SuccessResponse;
 import com.project.teman_belajar.module.auth.service.AuthenticationService;
 import com.project.teman_belajar.module.auth.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +23,7 @@ public class AuthenticationController {
     private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterSuccessResponse> register(
+    public ResponseEntity<SuccessResponse> register(
             @RequestBody RegisterRequest request
     ){
         return ResponseEntity.ok(authenticationService.register(request));
@@ -43,8 +41,18 @@ public class AuthenticationController {
         return ResponseEntity.ok(refreshTokenService.generateNewToken(request));
     }
 
+    @PostMapping("/change-password")
+    public ResponseEntity<SuccessResponse> changePassword(@RequestBody ChangePasswordRequest request){
+        return ResponseEntity.ok(authenticationService.changePassword(request));
+    }
+
+    @PostMapping("/send-otp")
+    public ResponseEntity<SuccessResponse> sendOtp(@RequestBody String email){
+        return ResponseEntity.ok(authenticationService.sendOtpWithEmail(email));
+    }
+
     @PostMapping("/log-out")
     public ResponseEntity<DeleteRefreshTokenResponse> logout(@RequestBody LogoutRequest request) {
-        return refreshTokenService.deleteByUserId(request.id());
+        return ResponseEntity.ok(refreshTokenService.deleteByUserId(request.id()));
     }
 }
