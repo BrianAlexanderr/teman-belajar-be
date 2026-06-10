@@ -52,7 +52,7 @@ public class FoldersCustomException {
     @ExceptionHandler(SameFolderNameException.class)
     public ResponseEntity<ErrorResponse> handleSameFolderNameException(SameFolderNameException ex){
         ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.CONFLICT.value(),
+                HttpStatus.BAD_REQUEST.value(),
                 ex.getMessage(),
                 LocalDateTime.now().toString()
         );
