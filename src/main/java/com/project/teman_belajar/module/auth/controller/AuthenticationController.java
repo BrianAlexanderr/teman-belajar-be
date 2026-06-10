@@ -4,11 +4,11 @@ import com.project.teman_belajar.module.auth.dto.request.*;
 import com.project.teman_belajar.module.auth.dto.response.AuthenticationResponse;
 import com.project.teman_belajar.module.auth.dto.response.DeleteRefreshTokenResponse;
 import com.project.teman_belajar.module.auth.dto.response.SuccessResponse;
+import com.project.teman_belajar.module.auth.dto.response.ValidOtpResponse;
 import com.project.teman_belajar.module.auth.service.AuthenticationService;
 import com.project.teman_belajar.module.auth.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,8 +47,13 @@ public class AuthenticationController {
     }
 
     @PostMapping("/send-otp")
-    public ResponseEntity<SuccessResponse> sendOtp(@RequestBody String email){
-        return ResponseEntity.ok(authenticationService.sendOtpWithEmail(email));
+    public ResponseEntity<SuccessResponse> sendOtp(@RequestBody SendOtpRequest request){
+        return ResponseEntity.ok(authenticationService.sendOtpWithEmail(request));
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<ValidOtpResponse> verifyOtp(@RequestBody VerifyOtpRequest request){
+        return ResponseEntity.ok(authenticationService.validateOtpOrThrow(request));
     }
 
     @PostMapping("/log-out")

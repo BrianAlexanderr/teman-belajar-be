@@ -1,5 +1,6 @@
 package com.project.teman_belajar.module.quiz.entities;
 
+import com.project.teman_belajar.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,13 +13,13 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Questions {
+public class Questions extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private UUID id;
 
-	private String question_text;
+	private String question;
 
 	private String answerA;
 	private String answerB;

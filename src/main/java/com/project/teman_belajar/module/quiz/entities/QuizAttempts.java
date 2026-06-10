@@ -1,5 +1,6 @@
 package com.project.teman_belajar.module.quiz.entities;
 
+import com.project.teman_belajar.common.entity.BaseEntity;
 import com.project.teman_belajar.module.auth.entities.Users;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -14,7 +15,7 @@ import java.util.UUID;
 @Setter
 @Getter
 @NoArgsConstructor
-public class QuizAttempts {
+public class QuizAttempts extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

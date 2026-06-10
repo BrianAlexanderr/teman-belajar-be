@@ -8,9 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
-import org.hibernate.envers.Audited;
-import org.hibernate.envers.NotAudited;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
@@ -34,8 +31,6 @@ public class Users extends BaseEntity implements UserDetails {
     private String name;
 
     private String email;
-
-    private boolean isSubscribe;
     
     private String passwordHashed;
 

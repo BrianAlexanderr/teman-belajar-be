@@ -82,4 +82,24 @@ public class AuthCustomExceptionHandler {
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(WrongTokenTypeException.class)
+    public ResponseEntity<ErrorResponse> wrongTokenTypeException(WrongTokenTypeException ex){
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                ex.getMessage(),
+                LocalDateTime.now().toString()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(TokenNotValid.class)
+    public ResponseEntity<ErrorResponse> tokenNotValidException(TokenNotValid ex){
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                ex.getMessage(),
+                LocalDateTime.now().toString()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
 }

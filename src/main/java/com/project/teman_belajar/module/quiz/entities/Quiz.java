@@ -1,12 +1,12 @@
 package com.project.teman_belajar.module.quiz.entities;
 
-import com.project.teman_belajar.module.extract.entities.ExtractedText;
+import com.project.teman_belajar.common.entity.BaseEntity;
+import com.project.teman_belajar.module.summarize.entities.Summary;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,7 +14,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Quiz {
+public class Quiz extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -22,16 +22,14 @@ public class Quiz {
 
     private String title;
 
-    private Date createdAt;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "extracted_text_id")
-    private ExtractedText extractedText;
-
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Questions> questionsList;
 
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QuizAttempts> quizAttemptsList;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "summary_id")
+    private Summary summary;
 }
 
