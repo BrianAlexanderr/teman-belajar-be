@@ -1,16 +1,16 @@
 package com.project.teman_belajar.module.auth.service;
 
-import com.project.teman_belajar.module.auth.dto.request.AuthenticationRequest;
-import com.project.teman_belajar.module.auth.dto.request.ChangePasswordRequest;
-import com.project.teman_belajar.module.auth.dto.request.RegisterRequest;
+import com.project.teman_belajar.module.auth.dto.request.*;
 import com.project.teman_belajar.module.auth.dto.response.AuthenticationResponse;
 import com.project.teman_belajar.module.auth.dto.response.SuccessResponse;
+import com.project.teman_belajar.module.auth.dto.response.ValidOtpResponse;
 import com.project.teman_belajar.module.auth.entities.RefreshToken;
 import com.project.teman_belajar.module.auth.entities.Role;
 import com.project.teman_belajar.module.auth.entities.Users;
 import com.project.teman_belajar.module.auth.exception.custom_exception.DuplicateEmailException;
 import com.project.teman_belajar.module.auth.exception.custom_exception.OtpNotValidException;
 import com.project.teman_belajar.module.auth.exception.custom_exception.SamePasswordException;
+import com.project.teman_belajar.module.auth.exception.custom_exception.TokenNotValid;
 import com.project.teman_belajar.module.auth.repository.UserRepository;
 import com.project.teman_belajar.module.email.dto.request.SendEmailRequest;
 import com.project.teman_belajar.module.email.service.EmailService;
@@ -22,7 +22,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -55,7 +54,6 @@ public class AuthenticationService {
         user.setEmail(request.email());
         user.setPasswordHashed(passwordEncoder.encode(request.password()));
         user.setRole(Role.USER);
-        user.setSubscribe(false);
 
         userRepository.save(user);
 
@@ -83,7 +81,8 @@ public class AuthenticationService {
         return new AuthenticationResponse(jwtToken,  refreshToken.getToken());
     }
 
-    public SuccessResponse sendOtpWithEmail(String email){
+    public SuccessResponse sendOtpWithEmail(SendOtpRequest requests){
+        String email = requests.email();
 
         String otp = otpService.generateAndStoreOtp(email);
 
@@ -106,10 +105,25 @@ public class AuthenticationService {
         );
     }
 
-    private void validateOtpOrThrow(String email, String otp){
+    public ValidOtpResponse validateOtpOrThrow(VerifyOtpRequest request){
+        String email = request.email();
+        String otp = request.otp();
+
+        Users requestUser = userRepository.findByEmail(email).orElseThrow(
+                () -> new UserNotFoundException("Email tidak ditemukan")
+        );
+
         if(!otpService.validOtp(email, otp)){
             throw new OtpNotValidException("Otp yang digunakan tidak valid!");
         }
+
+        String verifiedToken = jwtService.generateResetPasswordToken(requestUser);
+
+        otpService.deleteOtp(email);
+
+        return new ValidOtpResponse(
+                verifiedToken
+        );
     }
 
     private void validateNewPassword(String rawNewPassword, String hashedOldPassword){
@@ -124,7 +138,11 @@ public class AuthenticationService {
         Users user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found!"));
 
-        validateOtpOrThrow(email, request.otp());
+        if(!jwtService.validateResetPasswordToken(request.resetToken(), user)){
+            throw new TokenNotValid(
+                    "Token tidak valid"
+            );
+        }
 
         validateNewPassword(request.newPassword(), user.getPassword());
 
@@ -133,8 +151,6 @@ public class AuthenticationService {
         user.setPasswordHashed(hashedNewPassword);
 
         userRepository.save(user);
-
-        otpService.deleteOtp(email);
 
         return new SuccessResponse("Success Change Password", new Date());
     }

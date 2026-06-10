@@ -1,6 +1,7 @@
 package com.project.teman_belajar.module.auth.service;
 
 import com.project.teman_belajar.module.auth.entities.Users;
+import com.project.teman_belajar.module.auth.exception.custom_exception.WrongTokenTypeException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -57,7 +58,13 @@ public class JwtService {
         return buildToken(extraClaims, user, REFRESH_EXPIRATION);
     }
 
-    public String buildToken(
+    public String generateResetPasswordToken(UserDetails user){
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("token_type", "RESET_PASSWORD");
+        return buildToken(extraClaims, user, JWT_EXPIRATION);
+    }
+
+    private String buildToken(
             Map<String, Object> extraClaims,
             UserDetails userDetails,
             long expiration
@@ -80,6 +87,26 @@ public class JwtService {
         return userVersion.equals(claimVersion);
     }
 
+    private void validResetTypeOrThrow(String type){
+        if(!type.equals("RESET_PASSWORD")){
+            throw new WrongTokenTypeException(
+                    "Wrong Token Type"
+            );
+        }
+    }
+
+    public boolean validateResetPasswordToken(String token, UserDetails user){
+        final String email = extractUserEmail(token);
+        final String type = extractClaim(
+                token,
+                claims -> claims.get("token_type").toString()
+        );
+
+        validResetTypeOrThrow(type);
+
+        return (email.equals(user.getUsername()) && isTokenNotExpired(token));
+    }
+
     public boolean validateToken(String token, UserDetails userDetails){
         final String email = extractUserEmail(token);
         final Long userVersion = getUserVersion(userDetails);
@@ -88,12 +115,12 @@ public class JwtService {
                 claims -> claims.get("version", Long.class)
         );
         return (email.equals(userDetails.getUsername())) &&
-                !isTokenExpired(token) &&
+                isTokenNotExpired(token) &&
                 isValidVersion(userVersion, claimVersion);
     }
 
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+    private boolean isTokenNotExpired(String token) {
+        return !extractExpiration(token).before(new Date());
     }
 
     private Date extractExpiration(String token) {

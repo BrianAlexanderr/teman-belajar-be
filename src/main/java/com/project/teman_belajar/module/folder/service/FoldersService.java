@@ -55,7 +55,6 @@ public class FoldersService {
         Folders folder = new Folders();
         folder.setName(request.name());
         folder.setUser(user);
-        folder.setCreatedAt(new Date());
 
         Folders savedFolder = foldersRepository.save(folder);
 
