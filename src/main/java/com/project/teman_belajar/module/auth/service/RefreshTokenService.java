@@ -83,7 +83,7 @@ public class RefreshTokenService {
 
                         String newAccessToken = jwtService.generateAccessToken(user);
 
-                        return new AuthenticationResponse(newAccessToken, requestRefreshToken);
+                        return new AuthenticationResponse(user.getName(), newAccessToken, requestRefreshToken);
                     }
                     throw new TokenRefreshException(requestRefreshToken);
                 })

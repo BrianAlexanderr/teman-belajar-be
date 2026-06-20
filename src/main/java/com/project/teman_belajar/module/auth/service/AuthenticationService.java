@@ -78,7 +78,7 @@ public class AuthenticationService {
 
         RefreshToken refreshToken = refreshTokenService.getOrCreateRefreshToken(user.getId());
 
-        return new AuthenticationResponse(jwtToken,  refreshToken.getToken());
+        return new AuthenticationResponse(user.getName(), jwtToken,  refreshToken.getToken());
     }
 
     public SuccessResponse sendOtpWithEmail(SendOtpRequest requests){
