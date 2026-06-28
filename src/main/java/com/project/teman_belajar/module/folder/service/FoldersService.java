@@ -4,12 +4,16 @@ import com.project.teman_belajar.module.auth.entities.Users;
 import com.project.teman_belajar.module.folder.dto.request.FolderRequest;
 import com.project.teman_belajar.module.folder.dto.request.RenameFolderRequest;
 import com.project.teman_belajar.module.folder.dto.response.FolderCreateSuccessResponse;
+import com.project.teman_belajar.module.materials.dto.response.MaterialDetailResponse;
 import com.project.teman_belajar.module.folder.dto.response.UserFolderResponse;
 import com.project.teman_belajar.module.folder.entities.Folders;
 import com.project.teman_belajar.module.folder.exception.custom_exceptions.FolderNotFoundException;
 import com.project.teman_belajar.module.folder.exception.custom_exceptions.SameFolderNameException;
 import com.project.teman_belajar.module.folder.exception.custom_exceptions.UserNotFoundException;
 import com.project.teman_belajar.module.folder.repository.FoldersRepository;
+import com.project.teman_belajar.module.materials.entities.Materials;
+import com.project.teman_belajar.module.materials.repository.MaterialsRepository;
+import com.project.teman_belajar.module.upload.enums.UploadStatunEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,7 +25,9 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class FoldersService {
+
     private final FoldersRepository foldersRepository;
+    private final MaterialsRepository materialsRepository;
 
     public List<UserFolderResponse> getUserFolders(UUID id){
         Optional<List<Folders>> userFolder =  foldersRepository.findByUserId(id);
@@ -61,9 +67,13 @@ public class FoldersService {
         );
     }
 
+    public Folders findFolderByIdOrThrow(UUID id) {
+        return foldersRepository.findById(id)
+                .orElseThrow(() -> new FolderNotFoundException("Folder id tidak ditemukan"));
+    }
+
     public void renameFolder(RenameFolderRequest request){
-        Folders folder = foldersRepository.findById(request.id())
-                .orElseThrow(() -> new FolderNotFoundException("Folder tidak ditemukan"));
+        Folders folder = findFolderByIdOrThrow(request.id());
 
         if(request.newName().equals(folder.getName())){
             throw new SameFolderNameException("Folder harus memiliki nama yang berbeda!");
@@ -75,21 +85,39 @@ public class FoldersService {
     }
 
     public UserFolderResponse findFolderById(UUID id){
-        Optional<Folders> folders = foldersRepository.findById(id);
-
-        if(folders.isEmpty()) throw new FolderNotFoundException("Folder tidak ditemukan");
+        Folders folders = findFolderByIdOrThrow(id);
 
         return new UserFolderResponse(
-                folders.get().getId(),
-                folders.get().getName()
+                folders.getId(),
+                folders.getName()
         );
     }
 
     public void deleteFolderById(UUID folderId){
-        Optional<Folders> folder = foldersRepository.findById(folderId);
+        Folders folder = findFolderByIdOrThrow(folderId);
 
-        if(folder.isEmpty()) throw new FolderNotFoundException("Folder tidak ditemukan");
+        foldersRepository.delete(folder);
+    }
 
-        foldersRepository.delete(folder.get());
+    private List<MaterialDetailResponse> transformToResponse(List<Materials> materialsList) {
+        return materialsList.stream()
+                .map(m ->
+                        MaterialDetailResponse.builder()
+                        .fileId(String.valueOf(m.getId()))
+                        .fileName(m.getName())
+                        .fileType(m.getType()).build()
+                )
+                .toList();
+    }
+
+    public List<MaterialDetailResponse> getMaterialFromFolder(String id) {
+        List<Materials> materials = materialsRepository.findByFolders_IdAndStatus(
+                UUID.fromString(id),
+                UploadStatunEnum.SUCCESS.getLabel()
+        );
+
+        return transformToResponse(
+                materials
+        );
     }
 }

@@ -3,9 +3,7 @@ package com.project.teman_belajar.module.materials.entities;
 import com.project.teman_belajar.common.entity.BaseEntity;
 import com.project.teman_belajar.module.folder.entities.Folders;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.UUID;
 
@@ -13,6 +11,8 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Materials extends BaseEntity {
 
     @Id
@@ -24,6 +24,8 @@ public class Materials extends BaseEntity {
     private String path;
 
     private String type;
+
+    private String status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "folders_id")

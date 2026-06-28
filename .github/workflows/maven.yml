@@ -40,16 +40,21 @@ jobs:
       MAIL_PASSWORD: ${{secrets.MAIL_PASSWORD}}
       SPRING_REDIS_HOST: localhost
       SPRING_REDIS_PORT: 6379
+      SUPABASE_S3_ENDPOINT: ${{secrets.SUPABASE_S3_ENDPOINT}}
+      SUPABASE_ACCESS_KEY: ${{secrets.SUPABASE_ACCESS_KEY}}
+      SUPABASE_SECRET_KEY: ${{secrets.SUPABASE_SECRET_KEY}}
+      SUPABASE_S3_REGION: ${{secrets.SUPABASE_S3_REGION}}
+      SUPABASE_BUCKET_NAME: ${{secrets.SUPABASE_BUCKET_NAME}}
     permissions:
       contents: write
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set up JDK 25
+    - name: Set up JDK 21
       uses: actions/setup-java@v4
       with:
-        java-version: '25'
+        java-version: '21'
         distribution: 'temurin'
         cache: maven
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
+    - name: Build and Test with Maven
+      run: mvn clean verify -Dspring.profiles.active=test
