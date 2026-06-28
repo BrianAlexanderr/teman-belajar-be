@@ -4,6 +4,7 @@ import com.project.teman_belajar.module.auth.entities.Users;
 import com.project.teman_belajar.module.folder.dto.request.FolderRequest;
 import com.project.teman_belajar.module.folder.dto.request.RenameFolderRequest;
 import com.project.teman_belajar.module.folder.dto.response.FolderCreateSuccessResponse;
+import com.project.teman_belajar.module.materials.dto.response.MaterialDetailResponse;
 import com.project.teman_belajar.module.folder.dto.response.UserFolderResponse;
 import com.project.teman_belajar.module.folder.service.FoldersService;
 import jakarta.validation.Valid;
@@ -40,6 +41,17 @@ public class FoldersController {
     public ResponseEntity<UserFolderResponse> getFolderById(@PathVariable UUID id){
         return ResponseEntity.ok(
                 foldersService.findFolderById(id)
+        );
+    }
+
+    @GetMapping("/{id}/materials")
+    public ResponseEntity<List<MaterialDetailResponse>> getMaterialByFolder(
+            @PathVariable String id
+    ) {
+        return ResponseEntity.ok(
+                foldersService.getMaterialFromFolder(
+                        id
+                )
         );
     }
 
