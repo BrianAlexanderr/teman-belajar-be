@@ -40,6 +40,11 @@ jobs:
       MAIL_PASSWORD: ${{secrets.MAIL_PASSWORD}}
       SPRING_REDIS_HOST: localhost
       SPRING_REDIS_PORT: 6379
+      SUPABASE_S3_ENDPOINT: ${{secrets.SUPABASE_S3_ENDPOINT}}
+      SUPABASE_ACCESS_KEY: ${{secrets.SUPABASE_ACCESS_KEY}}
+      SUPABASE_SECRET_KEY: ${{secrets.SUPABASE_SECRET_KEY}}
+      SUPABASE_S3_REGION: ${{secrets.SUPABASE_REGION}}
+      SUPABASE_BUCKET_NAME: ${{secrets.SUPABASE_BUCKET_NAME}}
     permissions:
       contents: write
 
