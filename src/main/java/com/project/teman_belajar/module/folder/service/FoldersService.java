@@ -12,12 +12,14 @@ import com.project.teman_belajar.module.folder.exception.custom_exceptions.SameF
 import com.project.teman_belajar.module.folder.exception.custom_exceptions.UserNotFoundException;
 import com.project.teman_belajar.module.folder.repository.FoldersRepository;
 import com.project.teman_belajar.module.materials.entities.Materials;
+import com.project.teman_belajar.module.materials.repository.DeletedMaterialRepository;
 import com.project.teman_belajar.module.materials.repository.MaterialsRepository;
 import com.project.teman_belajar.module.upload.enums.UploadStatunEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -28,6 +30,7 @@ public class FoldersService {
 
     private final FoldersRepository foldersRepository;
     private final MaterialsRepository materialsRepository;
+    private final DeletedMaterialRepository deletedMaterialRepository;
 
     public List<UserFolderResponse> getUserFolders(UUID id){
         Optional<List<Folders>> userFolder =  foldersRepository.findByUserId(id);
@@ -93,8 +96,24 @@ public class FoldersService {
         );
     }
 
+    private void listDeletedMaterial(List<Materials> materialsList) {
+        for (Materials materials : materialsList) {
+            deletedMaterialRepository.insertDeletedMaterial(materials.getId());
+        }
+    }
+
+    @Transactional
     public void deleteFolderById(UUID folderId){
         Folders folder = findFolderByIdOrThrow(folderId);
+
+        List<Materials> existingMaterial = materialsRepository.findByFolders_IdAndStatus(
+                folderId,
+                UploadStatunEnum.SUCCESS.getLabel()
+        );
+
+        if(!existingMaterial.isEmpty()) {
+            listDeletedMaterial(existingMaterial);
+        }
 
         foldersRepository.delete(folder);
     }

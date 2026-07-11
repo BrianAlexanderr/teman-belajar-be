@@ -3,6 +3,7 @@ package com.project.teman_belajar.module.upload.service;
 import com.project.teman_belajar.module.materials.exception.custom_exception.FileNotFoundException;
 import com.project.teman_belajar.module.upload.dto.response.StorageUrlResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -12,9 +13,11 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequ
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import java.time.Duration;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ObjectStorageService {
 
     private final S3Presigner s3Presigner;
@@ -79,9 +82,34 @@ public class ObjectStorageService {
                     .build();
 
             s3Client.deleteObject(deleteObjectRequest);
+            log.info("File {} berhasil dihapus", uniqueFileName);
 
         } catch (S3Exception e) {
             throw new RuntimeException("Gagal menghapus file dari storage: " + e.getMessage());
+        }
+    }
+
+    public void deleteBulkFile(List<String> fileNameList) {
+        if (fileNameList == null || fileNameList.isEmpty()) {
+            return;
+        }
+
+        List<ObjectIdentifier> keys = fileNameList.stream()
+                .map(fileName -> ObjectIdentifier.builder().key(fileName).build())
+                .toList();
+
+        try {
+            DeleteObjectsRequest deleteRequest = DeleteObjectsRequest.builder()
+                    .bucket(bucketName)
+                    .delete(Delete.builder().objects(keys).build())
+                    .build();
+
+            s3Client.deleteObjects(deleteRequest);
+            log.info("{} file berhasil dihapus secara batch dari S3", fileNameList.size());
+
+        } catch (S3Exception e) {
+            log.error("Gagal menghapus batch file dari S3: {}", e.getMessage());
+            throw new RuntimeException("Gagal menghapus batch file");
         }
     }
 }
