@@ -4,9 +4,11 @@ import com.project.teman_belajar.module.auth.dto.response.SuccessResponse;
 import com.project.teman_belajar.module.folder.entities.Folders;
 import com.project.teman_belajar.module.folder.exception.custom_exceptions.FolderNotFoundException;
 import com.project.teman_belajar.module.folder.repository.FoldersRepository;
+import com.project.teman_belajar.module.materials.dto.request.RenameMaterialRequest;
 import com.project.teman_belajar.module.materials.entities.Materials;
 import com.project.teman_belajar.module.materials.exception.custom_exception.FileNotFoundException;
 import com.project.teman_belajar.module.materials.exception.custom_exception.FileTypeNotAllowedException;
+import com.project.teman_belajar.module.materials.repository.DeletedMaterialRepository;
 import com.project.teman_belajar.module.materials.repository.MaterialsRepository;
 import com.project.teman_belajar.module.upload.service.ObjectStorageService;
 import com.project.teman_belajar.module.upload.dto.request.UploadFileRequest;
@@ -29,6 +31,7 @@ import java.util.UUID;
 public class MaterialsService {
 
     private final MaterialsRepository materialsRepository;
+    private final DeletedMaterialRepository deletedMaterialRepository;
     private final FoldersRepository foldersRepository;
     private final ObjectStorageService objectStorageService;
 
@@ -39,13 +42,6 @@ public class MaterialsService {
                 .status(UploadStatunEnum.PENDING.getLabel())
                 .folders(folders)
                 .build();
-    }
-
-    public List<Materials> getMaterialByStatusAndCreatedAt(String status, LocalDateTime createdAt){
-        return materialsRepository.findByStatusAndCreatedAtBefore(
-                status,
-                createdAt
-        );
     }
 
     public StorageUrlResponse uploadFile(UploadFileRequest uploadFileRequest) {
@@ -82,14 +78,33 @@ public class MaterialsService {
         materialsRepository.saveAndFlush(materials);
     }
 
-    public void deleteAllExpiredFile(List<Materials> expiredPendingFiles) {
-        materialsRepository.deleteAll(expiredPendingFiles);
+    @Transactional
+    public int deleteAllExpiredFile(String status, LocalDateTime createdAt) {
+        return materialsRepository.deleteByStatusAndCreatedAtBefore(
+                status,
+                createdAt
+        );
     }
 
     public StorageUrlResponse getViewUrl(String id, String fileName) {
         return objectStorageService.generateViewUrl(
                 id,
                 fileName
+        );
+    }
+
+    public SuccessResponse renameMaterial(RenameMaterialRequest request) {
+        Materials existingMaterial = materialsRepository.findById(
+                UUID.fromString(request.id())
+        ).orElseThrow(() -> new FileNotFoundException("File tidak ditemukan"));
+
+        existingMaterial.setName(request.newName());
+
+        materialsRepository.save(existingMaterial);
+
+        return new SuccessResponse(
+                "Berhasil mengubah nama file",
+                new Date()
         );
     }
 
@@ -107,5 +122,26 @@ public class MaterialsService {
                 "Berhasil Menghapus Material",
                 new Date()
         );
+    }
+
+    public void deleteBulkFile() {
+
+        List<String> deletedMaterials = deletedMaterialRepository.findIdsWithLimit();
+
+        try {
+            objectStorageService.deleteBulkFile(deletedMaterials);
+
+            List<UUID> uuidList = deletedMaterials.stream()
+                    .map(UUID::fromString)
+                    .toList();
+
+            deletedMaterialRepository.deleteAllById(uuidList);
+
+            log.info("Berhasil membersihkan {} data dari deleted_materials", uuidList.size());
+
+        } catch (Exception e) {
+            log.error("Proses pembersihan file tertunda: {}", e.getMessage());
+        }
+
     }
 }

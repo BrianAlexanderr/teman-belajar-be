@@ -1,6 +1,7 @@
 package com.project.teman_belajar.module.materials.controller;
 
 import com.project.teman_belajar.module.auth.dto.response.SuccessResponse;
+import com.project.teman_belajar.module.materials.dto.request.RenameMaterialRequest;
 import com.project.teman_belajar.module.materials.dto.request.SetStatusRequest;
 import com.project.teman_belajar.module.materials.service.MaterialsService;
 import com.project.teman_belajar.module.upload.dto.request.UploadFileRequest;
@@ -44,6 +45,17 @@ public class MaterialsController {
                 materialsService.getViewUrl(
                         id,
                         fileName
+                )
+        );
+    }
+
+    @PutMapping("rename")
+    public ResponseEntity<SuccessResponse> renameMaterials(
+            @RequestBody RenameMaterialRequest request
+    ) {
+        return ResponseEntity.ok(
+                materialsService.renameMaterial(
+                        request
                 )
         );
     }

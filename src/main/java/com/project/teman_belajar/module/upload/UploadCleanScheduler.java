@@ -1,6 +1,6 @@
 package com.project.teman_belajar.module.upload;
 
-import com.project.teman_belajar.module.materials.entities.Materials;
+
 import com.project.teman_belajar.module.materials.service.MaterialsService;
 import com.project.teman_belajar.module.upload.enums.UploadStatunEnum;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +9,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -18,19 +17,28 @@ public class UploadCleanScheduler {
 
     private final MaterialsService materialsService;
 
-    @Scheduled(fixedRate = 900000)
+
+    @Scheduled(fixedDelay = 300000)
     public void cleanupFailedUploads() {
         LocalDateTime expirationTime = LocalDateTime.now().minusMinutes(15);
 
-        List<Materials> expiredPendingFiles = materialsService.getMaterialByStatusAndCreatedAt(
-                        UploadStatunEnum.PENDING.getLabel(),
-                        expirationTime
-                );
-
-        if (!expiredPendingFiles.isEmpty()) {
-            materialsService.deleteAllExpiredFile(expiredPendingFiles);
-            log.info("Menghapus {} metadata upload yang gagal.", expiredPendingFiles.size());
+        try {
+            int deletedCount = materialsService.deleteAllExpiredFile(
+                    UploadStatunEnum.PENDING.getLabel(),
+                    expirationTime
+            );
+            if(deletedCount > 0) {
+                log.info("Berhasil menghapus {} file dengan status Pending", deletedCount);
+            }
+        } catch (Exception e) {
+            log.error("Gagal menjalankan cleanup failed uploads", e);
         }
+
+    }
+
+    @Scheduled(cron = "0 0 * * * *")
+    public void cleanDeletedFile() {
+        materialsService.deleteBulkFile();
     }
 
 }
