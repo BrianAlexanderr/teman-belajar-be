@@ -1,4 +1,4 @@
-package com.project.teman_belajar.module.upload.enums;
+package com.project.teman_belajar.module.object_storage.enums;
 
 import lombok.Getter;
 

@@ -1,8 +1,8 @@
-package com.project.teman_belajar.module.upload;
+package com.project.teman_belajar.module.object_storage;
 
 
 import com.project.teman_belajar.module.materials.service.MaterialsService;
-import com.project.teman_belajar.module.upload.enums.UploadStatunEnum;
+import com.project.teman_belajar.module.object_storage.enums.UploadStatunEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class UploadCleanScheduler {
+public class ObjectStorageScheduler {
 
     private final MaterialsService materialsService;
 

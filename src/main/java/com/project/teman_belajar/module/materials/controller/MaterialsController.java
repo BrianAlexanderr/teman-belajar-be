@@ -1,14 +1,18 @@
 package com.project.teman_belajar.module.materials.controller;
 
 import com.project.teman_belajar.module.auth.dto.response.SuccessResponse;
+import com.project.teman_belajar.module.auth.entities.Users;
 import com.project.teman_belajar.module.materials.dto.request.RenameMaterialRequest;
 import com.project.teman_belajar.module.materials.dto.request.SetStatusRequest;
 import com.project.teman_belajar.module.materials.service.MaterialsService;
-import com.project.teman_belajar.module.upload.dto.request.UploadFileRequest;
-import com.project.teman_belajar.module.upload.dto.response.StorageUrlResponse;
+import com.project.teman_belajar.module.object_storage.dto.request.UploadFileRequest;
+import com.project.teman_belajar.module.object_storage.dto.response.StorageUrlResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/materials")
@@ -36,15 +40,30 @@ public class MaterialsController {
         );
     }
 
+    @GetMapping("/download")
+    public ResponseEntity<StorageUrlResponse> downloadMaterialsPresignedUrl(
+            @RequestParam UUID materialId,
+            @AuthenticationPrincipal Users users
+    ) {
+        return ResponseEntity.ok(
+                materialsService.downloadFile(
+                        materialId,
+                        users.getId()
+                )
+        );
+    }
+
     @GetMapping("info")
     public ResponseEntity<StorageUrlResponse> getMaterialsInfo(
             @RequestParam String id,
-            @RequestParam String fileName
-    ) {
+            @RequestParam String fileName,
+            @AuthenticationPrincipal Users user
+            ) {
         return ResponseEntity.ok(
                 materialsService.getViewUrl(
                         id,
-                        fileName
+                        fileName,
+                        user.getId()
                 )
         );
     }

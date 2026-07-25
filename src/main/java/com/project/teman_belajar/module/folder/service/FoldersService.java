@@ -14,7 +14,7 @@ import com.project.teman_belajar.module.folder.repository.FoldersRepository;
 import com.project.teman_belajar.module.materials.entities.Materials;
 import com.project.teman_belajar.module.materials.repository.DeletedMaterialRepository;
 import com.project.teman_belajar.module.materials.repository.MaterialsRepository;
-import com.project.teman_belajar.module.upload.enums.UploadStatunEnum;
+import com.project.teman_belajar.module.object_storage.enums.UploadStatunEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

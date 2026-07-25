@@ -1,5 +1,6 @@
 package com.project.teman_belajar.module.materials.service;
 
+import com.project.teman_belajar.common.global_exception.exception.ResourceNotFoundException;
 import com.project.teman_belajar.module.auth.dto.response.SuccessResponse;
 import com.project.teman_belajar.module.folder.entities.Folders;
 import com.project.teman_belajar.module.folder.exception.custom_exceptions.FolderNotFoundException;
@@ -10,13 +11,14 @@ import com.project.teman_belajar.module.materials.exception.custom_exception.Fil
 import com.project.teman_belajar.module.materials.exception.custom_exception.FileTypeNotAllowedException;
 import com.project.teman_belajar.module.materials.repository.DeletedMaterialRepository;
 import com.project.teman_belajar.module.materials.repository.MaterialsRepository;
-import com.project.teman_belajar.module.upload.service.ObjectStorageService;
-import com.project.teman_belajar.module.upload.dto.request.UploadFileRequest;
-import com.project.teman_belajar.module.upload.dto.response.StorageUrlResponse;
-import com.project.teman_belajar.module.upload.enums.AllowedMaterialFileType;
-import com.project.teman_belajar.module.upload.enums.UploadStatunEnum;
+import com.project.teman_belajar.module.object_storage.service.ObjectStorageService;
+import com.project.teman_belajar.module.object_storage.dto.request.UploadFileRequest;
+import com.project.teman_belajar.module.object_storage.dto.response.StorageUrlResponse;
+import com.project.teman_belajar.module.object_storage.enums.AllowedMaterialFileType;
+import com.project.teman_belajar.module.object_storage.enums.UploadStatunEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,6 +46,16 @@ public class MaterialsService {
                 .build();
     }
 
+    private void verifyMaterialOwnership(UUID materialId, UUID userId) {
+        UUID ownerId = materialsRepository.findOwnerIdByMaterialId(
+                materialId
+        ).orElseThrow(() -> new ResourceNotFoundException("Owner Materi tidak ditemukan!"));
+
+        if(!ownerId.equals(userId)) {
+            throw new AccessDeniedException("Anda tidak memiliki hak akses materi ini!");
+        }
+    }
+
     public StorageUrlResponse uploadFile(UploadFileRequest uploadFileRequest) {
         String fileName = uploadFileRequest.fileName();
         String fileType = uploadFileRequest.fileType();
@@ -60,10 +72,23 @@ public class MaterialsService {
 
         String materialId = materialsRepository.saveAndFlush(materials).getId().toString();
 
-        return objectStorageService.generatePresignedUrl(
+        return objectStorageService.generatePresignedPutUrl(
                 materialId,
                 fileType
         );
+    }
+
+    public StorageUrlResponse downloadFile(UUID materialId, UUID userId) {
+
+        verifyMaterialOwnership(materialId, userId);
+
+        String presignedUrl = objectStorageService.generatePresignedGetUrl(
+                materialId.toString()
+        );
+
+        return StorageUrlResponse.builder()
+                .url(presignedUrl)
+                .build();
     }
 
     public void setUploadStatusSuccess(String materialId) {
@@ -86,7 +111,13 @@ public class MaterialsService {
         );
     }
 
-    public StorageUrlResponse getViewUrl(String id, String fileName) {
+    public StorageUrlResponse getViewUrl(String id, String fileName, UUID userId) {
+
+        Materials material = materialsRepository.findById(UUID.fromString(id))
+                .orElseThrow(() -> new FileNotFoundException("Material tidak ditemukan"));
+
+        verifyMaterialOwnership(material.getId(), userId);
+
         return objectStorageService.generateViewUrl(
                 id,
                 fileName

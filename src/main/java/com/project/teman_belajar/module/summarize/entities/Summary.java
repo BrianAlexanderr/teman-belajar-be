@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.List;
 import java.util.UUID;
@@ -21,17 +23,22 @@ public class Summary extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    private String name;
+    private String title;
 
-    private String path;
+    private String preview;
 
-    private String type;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "key_points", columnDefinition = "jsonb")
+    private List<String> keyPoints;
+
+    @Column(name = "content", columnDefinition = "TEXT")
+    private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "folders_id")
     private Folders folders;
 
-    @OneToMany(mappedBy = "summary", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "summary", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Quiz> quizList;
 
 }
