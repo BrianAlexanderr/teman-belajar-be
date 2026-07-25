@@ -1,6 +1,6 @@
 package com.project.teman_belajar;
 
-import com.project.teman_belajar.module.upload.service.ObjectStorageService;
+import com.project.teman_belajar.module.object_storage.service.ObjectStorageService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;

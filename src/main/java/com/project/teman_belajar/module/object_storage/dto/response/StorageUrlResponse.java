@@ -1,4 +1,4 @@
-package com.project.teman_belajar.module.upload.dto.response;
+package com.project.teman_belajar.module.object_storage.dto.response;
 
 import lombok.Builder;
 

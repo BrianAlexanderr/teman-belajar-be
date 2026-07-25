@@ -1,7 +1,7 @@
-package com.project.teman_belajar.module.upload.service;
+package com.project.teman_belajar.module.object_storage.service;
 
 import com.project.teman_belajar.module.materials.exception.custom_exception.FileNotFoundException;
-import com.project.teman_belajar.module.upload.dto.response.StorageUrlResponse;
+import com.project.teman_belajar.module.object_storage.dto.response.StorageUrlResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
@@ -30,7 +32,7 @@ public class ObjectStorageService {
     @Value("${supabase.s3.bucket-name}")
     private String bucketName;
 
-    public StorageUrlResponse generatePresignedUrl(String uniqueFileName, String contentType) {
+    public StorageUrlResponse generatePresignedPutUrl(String uniqueFileName, String contentType) {
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
@@ -49,6 +51,23 @@ public class ObjectStorageService {
                 .fileName(uniqueFileName)
                 .url(presignedRequest.url().toString())
                 .build();
+    }
+
+    public String generatePresignedGetUrl(String uniqueFileName) {
+
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(uniqueFileName)
+                .build();
+
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(15))
+                .getObjectRequest(getObjectRequest)
+                .build();
+
+        PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(presignRequest);
+
+        return presignedRequest.url().toString();
     }
 
     public StorageUrlResponse generateViewUrl(String uniqueFileName, String fileName) {

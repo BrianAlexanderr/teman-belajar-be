@@ -8,6 +8,7 @@
 		<version>4.0.6</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
+
 	<groupId>com.project</groupId>
 	<artifactId>teman-belajar</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
@@ -32,10 +33,21 @@
 		<jackson.version>2.21.1</jackson.version>
 		<jackson3.version>3.1.0</jackson3.version>
 		<jjwt.version>0.12.6</jjwt.version>
+		<langchain4j.version>1.17.2</langchain4j.version>
 	</properties>
 
+	<!-- =================================================================== -->
+	<!-- DEPENDENCY MANAGEMENT                                               -->
+	<!-- =================================================================== -->
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>dev.langchain4j</groupId>
+				<artifactId>langchain4j-bom</artifactId>
+				<version>${langchain4j.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
 				<artifactId>jackson-core</artifactId>
@@ -50,14 +62,24 @@
 	</dependencyManagement>
 
 	<dependencies>
+		<!-- =============================================================== -->
+		<!-- 1. CORE SPRING BOOT STARTERS                                    -->
+		<!-- =============================================================== -->
 		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>runtime</scope>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webmvc</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.hibernate.orm</groupId>
-			<artifactId>hibernate-envers</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -69,12 +91,48 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<!-- =============================================================== -->
+		<!-- 2. AI & LLM INTEGRATION (LANGCHAIN4J + GEMINI)                  -->
+		<!-- =============================================================== -->
+		<!-- Updated to Spring Boot 4 Starter; version handled by BOM -->
+		<dependency>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-spring-boot4-starter</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-webmvc</artifactId>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-google-ai-gemini</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-document-parser-apache-tika</artifactId>
+		</dependency>
+
+		<!-- =============================================================== -->
+		<!-- 3. DATABASE DRIVERS & ORM EXTENSIONS                            -->
+		<!-- =============================================================== -->
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.7.11</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate.orm</groupId>
+			<artifactId>hibernate-envers</artifactId>
+		</dependency>
+
+		<!-- =============================================================== -->
+		<!-- 4. OBJECT STORAGE & CLOUD (AWS SDK / SUPABASE COMPATIBLE)       -->
+		<!-- =============================================================== -->
 		<dependency>
 			<groupId>software.amazon.awssdk</groupId>
 			<artifactId>s3</artifactId>
@@ -85,12 +143,10 @@
 			<artifactId>url-connection-client</artifactId>
 			<version>2.25.0</version>
 		</dependency>
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>42.7.11</version>
-			<scope>runtime</scope>
-		</dependency>
+
+		<!-- =============================================================== -->
+		<!-- 5. AUTHENTICATION & SECURITY (JSON WEB TOKENS)                  -->
+		<!-- =============================================================== -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
@@ -107,34 +163,36 @@
 			<artifactId>jjwt-jackson</artifactId>
 			<version>${jjwt.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-validation</artifactId>
-		</dependency>
 
+		<!-- =============================================================== -->
+		<!-- 6. API DOCUMENTATION (OPENAPI / SWAGGER UI)                     -->
+		<!-- =============================================================== -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>3.0.2</version>
 		</dependency>
 
+		<!-- =============================================================== -->
+		<!-- 7. UTILITIES & CODE GENERATION                                  -->
+		<!-- =============================================================== -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<!-- =============================================================== -->
+		<!-- 8. TESTING DEPENDENCIES                                         -->
+		<!-- =============================================================== -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa-test</artifactId>
+			<artifactId>spring-boot-starter-webmvc-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-webmvc-test</artifactId>
+			<artifactId>spring-boot-starter-data-jpa-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -147,11 +205,7 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-    </dependencies>
+	</dependencies>
 
 	<build>
 		<plugins>
