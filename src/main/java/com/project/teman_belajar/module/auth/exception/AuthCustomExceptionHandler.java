@@ -2,6 +2,8 @@ package com.project.teman_belajar.module.auth.exception;
 
 import com.project.teman_belajar.common.global_exception.dto.ErrorResponse;
 import com.project.teman_belajar.module.auth.exception.custom_exception.*;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.LocalDateTime;
 
 @RestControllerAdvice(basePackages = "com.project.teman_belajar.module.auth")
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class AuthCustomExceptionHandler {
 
     @ExceptionHandler(TokenRefreshException.class)

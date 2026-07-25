@@ -4,6 +4,8 @@ import com.project.teman_belajar.common.global_exception.dto.ErrorResponse;
 import com.project.teman_belajar.module.folder.exception.custom_exceptions.FolderNotFoundException;
 import com.project.teman_belajar.module.folder.exception.custom_exceptions.SameFolderNameException;
 import com.project.teman_belajar.module.folder.exception.custom_exceptions.UserNotFoundException;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -14,6 +16,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import java.time.LocalDateTime;
 
 @RestControllerAdvice(basePackages = "com.project.teman_belajar.module.folder")
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class FoldersCustomException {
 
     @ExceptionHandler(UserNotFoundException.class)
