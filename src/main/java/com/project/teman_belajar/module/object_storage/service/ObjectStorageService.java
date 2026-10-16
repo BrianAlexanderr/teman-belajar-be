@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
@@ -129,6 +130,27 @@ public class ObjectStorageService {
         } catch (S3Exception e) {
             log.error("Gagal menghapus batch file dari S3: {}", e.getMessage());
             throw new RuntimeException("Gagal menghapus batch file");
+        }
+    }
+
+    public void uploadFileBytes(byte[] fileBytes, String uniqueFileName, String contentType) {
+        try {
+            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(uniqueFileName)
+                    .contentType(contentType)
+                    .build();
+
+            s3Client.putObject(
+                    putObjectRequest,
+                    RequestBody.fromBytes(fileBytes)
+            );
+
+            log.info("File {} berhasil diupload langsung ke storage", uniqueFileName);
+
+        } catch (S3Exception e) {
+            log.error("Gagal mengupload file ke storage: {}", e.getMessage());
+            throw new RuntimeException("Gagal mengupload file ke storage: " + e.getMessage());
         }
     }
 }

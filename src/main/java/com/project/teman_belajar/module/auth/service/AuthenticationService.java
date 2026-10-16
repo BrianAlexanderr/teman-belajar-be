@@ -1,5 +1,6 @@
 package com.project.teman_belajar.module.auth.service;
 
+import com.project.teman_belajar.common.validator.EmailValidator;
 import com.project.teman_belajar.module.auth.dto.request.*;
 import com.project.teman_belajar.module.auth.dto.response.AuthenticationResponse;
 import com.project.teman_belajar.module.auth.dto.response.SuccessResponse;
@@ -51,6 +52,11 @@ public class AuthenticationService {
         Users user = new Users();
 
         user.setName(request.firstName() + ' ' + request.lastName());
+
+        if(EmailValidator.isInvalidEmail(request.email())){
+            throw new IllegalArgumentException("Email tidak valid!");
+        }
+
         user.setEmail(request.email());
         user.setPasswordHashed(passwordEncoder.encode(request.password()));
         user.setRole(Role.USER);

@@ -5,10 +5,12 @@ import com.project.teman_belajar.module.auth.dto.response.AuthenticationResponse
 import com.project.teman_belajar.module.auth.dto.response.DeleteRefreshTokenResponse;
 import com.project.teman_belajar.module.auth.dto.response.SuccessResponse;
 import com.project.teman_belajar.module.auth.dto.response.ValidOtpResponse;
+import com.project.teman_belajar.module.auth.entities.Users;
 import com.project.teman_belajar.module.auth.service.AuthenticationService;
 import com.project.teman_belajar.module.auth.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,7 +59,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/log-out")
-    public ResponseEntity<DeleteRefreshTokenResponse> logout(@RequestBody LogoutRequest request) {
-        return ResponseEntity.ok(refreshTokenService.deleteByUserId(request.id()));
+    public ResponseEntity<DeleteRefreshTokenResponse> logout(@AuthenticationPrincipal Users user) {
+        return ResponseEntity.ok(refreshTokenService.deleteByUserId(user.getId()));
     }
 }

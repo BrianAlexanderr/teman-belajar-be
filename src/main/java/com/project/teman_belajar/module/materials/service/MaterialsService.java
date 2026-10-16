@@ -1,11 +1,15 @@
 package com.project.teman_belajar.module.materials.service;
 
+import com.lowagie.text.Document;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.PdfWriter;
 import com.project.teman_belajar.common.global_exception.exception.ResourceNotFoundException;
 import com.project.teman_belajar.module.auth.dto.response.SuccessResponse;
 import com.project.teman_belajar.module.folder.entities.Folders;
 import com.project.teman_belajar.module.folder.exception.custom_exceptions.FolderNotFoundException;
 import com.project.teman_belajar.module.folder.repository.FoldersRepository;
 import com.project.teman_belajar.module.materials.dto.request.RenameMaterialRequest;
+import com.project.teman_belajar.module.materials.dto.request.UploadImageRequest;
 import com.project.teman_belajar.module.materials.entities.Materials;
 import com.project.teman_belajar.module.materials.exception.custom_exception.FileNotFoundException;
 import com.project.teman_belajar.module.materials.exception.custom_exception.FileTypeNotAllowedException;
@@ -22,6 +26,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -56,26 +61,53 @@ public class MaterialsService {
         }
     }
 
-    public StorageUrlResponse uploadFile(UploadFileRequest uploadFileRequest) {
-        String fileName = uploadFileRequest.fileName();
-        String fileType = uploadFileRequest.fileType();
-
-        if(!AllowedMaterialFileType.isValidContentType(fileType)) {
-            throw new FileTypeNotAllowedException("Tipe file tidak valid");
+    public StorageUrlResponse uploadFile(UploadFileRequest request) {
+        if (!AllowedMaterialFileType.isValidContentType(request.fileType())) {
+            throw new FileTypeNotAllowedException("Tipe dokumen tidak valid");
         }
 
-        Folders folder = foldersRepository.findById(
-                UUID.fromString(uploadFileRequest.folderId())
-        ).orElseThrow(() -> new FolderNotFoundException("Folder tidak ditemukan"));
-
-        Materials materials = buildMaterial(fileName, fileType, folder);
-
-        String materialId = materialsRepository.saveAndFlush(materials).getId().toString();
+        Materials material = prepareAndSaveMaterial(request.fileName(), request.fileType(), request.folderId());
 
         return objectStorageService.generatePresignedPutUrl(
-                materialId,
-                fileType
+                material.getId().toString(),
+                request.fileType()
         );
+    }
+
+    public SuccessResponse processTextAndUpload(UploadImageRequest request) {
+        if (!AllowedMaterialFileType.isValidImageType(request.fileType())) {
+            throw new FileTypeNotAllowedException("Tipe gambar tidak valid");
+        }
+
+        String pdfFileName = request.fileName().replaceAll("\\.[^.]+$", "") + ".pdf";
+        String pdfContentType = "application/pdf";
+
+        Materials material = prepareAndSaveMaterial(pdfFileName, pdfContentType, request.folderId());
+        String materialId = material.getId().toString();
+
+        try {
+            byte[] processedPdfBytes = createPdf(request.extractedText());
+
+            objectStorageService.uploadFileBytes(processedPdfBytes, materialId, pdfContentType);
+
+            setUploadStatusSuccess(materialId);
+
+            return new SuccessResponse(
+                    "Berhasil Menyimpan Text dalam Gambar menjadi Dokumen!",
+                    new Date()
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Gagal memproses dan menyimpan dokumen: " + e.getMessage());
+        }
+    }
+
+    private Materials prepareAndSaveMaterial(String fileName, String fileType, String folderId) {
+        Folders folder = foldersRepository.findById(UUID.fromString(folderId))
+                .orElseThrow(() -> new FolderNotFoundException("Folder tidak ditemukan"));
+
+        Materials material = buildMaterial(fileName, fileType, folder);
+
+        return materialsRepository.saveAndFlush(material);
     }
 
     public StorageUrlResponse downloadFile(UUID materialId, UUID userId) {
@@ -174,5 +206,25 @@ public class MaterialsService {
             log.error("Proses pembersihan file tertunda: {}", e.getMessage());
         }
 
+    }
+
+    private byte[] createPdf(String extractedText) {
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+
+            Document document = new Document();
+
+            PdfWriter.getInstance(document, byteArrayOutputStream);
+
+            document.open();
+
+            document.add(new Paragraph(extractedText));
+
+            document.close();
+
+            return byteArrayOutputStream.toByteArray();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Gagal membuat atau mengupload PDF: " + e.getMessage());
+        }
     }
 }

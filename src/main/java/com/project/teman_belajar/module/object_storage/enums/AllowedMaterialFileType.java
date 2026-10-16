@@ -39,4 +39,14 @@ public enum AllowedMaterialFileType {
         return Arrays.stream(values())
                 .anyMatch(type -> type.getMimeTypes().contains(cleanContentType));
     }
+
+    public static boolean isValidImageType(String contentType) {
+        if (contentType == null || contentType.isEmpty()) {
+            return false;
+        }
+
+        String cleanContentType = contentType.trim().toLowerCase();
+
+        return IMAGE.getMimeTypes().contains(cleanContentType);
+    }
 }

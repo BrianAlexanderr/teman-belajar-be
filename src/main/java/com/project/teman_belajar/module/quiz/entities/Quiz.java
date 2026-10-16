@@ -1,6 +1,7 @@
 package com.project.teman_belajar.module.quiz.entities;
 
 import com.project.teman_belajar.common.entity.BaseEntity;
+import com.project.teman_belajar.module.auth.entities.Users;
 import com.project.teman_belajar.module.summarize.entities.Summary;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -34,5 +35,9 @@ public class Quiz extends BaseEntity {
     @JoinColumn(name = "summary_id")
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private Summary summary;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private Users user;
 }
 
