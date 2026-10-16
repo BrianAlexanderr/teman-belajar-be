@@ -19,9 +19,9 @@ public class QuestionAttempt extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    private String selected_answer;
+    private String selectedAnswer;
 
-    private boolean isCorrect;
+    private Boolean isCorrect;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id")

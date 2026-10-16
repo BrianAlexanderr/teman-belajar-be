@@ -4,6 +4,7 @@ import com.project.teman_belajar.module.auth.dto.response.SuccessResponse;
 import com.project.teman_belajar.module.auth.entities.Users;
 import com.project.teman_belajar.module.materials.dto.request.RenameMaterialRequest;
 import com.project.teman_belajar.module.materials.dto.request.SetStatusRequest;
+import com.project.teman_belajar.module.materials.dto.request.UploadImageRequest;
 import com.project.teman_belajar.module.materials.service.MaterialsService;
 import com.project.teman_belajar.module.object_storage.dto.request.UploadFileRequest;
 import com.project.teman_belajar.module.object_storage.dto.response.StorageUrlResponse;
@@ -29,6 +30,17 @@ public class MaterialsController {
                 materialsService.uploadFile(
                         uploadFileRequest
                 )
+        );
+    }
+
+    @PostMapping("upload/image")
+    public ResponseEntity<SuccessResponse> processText(
+            @RequestBody UploadImageRequest uploadImageRequest
+    ){
+        return ResponseEntity.ok(
+            materialsService.processTextAndUpload(
+                    uploadImageRequest
+            )
         );
     }
 

@@ -45,7 +45,7 @@ public class SummaryService {
     private final FoldersRepository foldersRepository;
 
     @Transactional
-    public SuccessResponse createCombinedSummary(SummaryRequest request) {
+    public SummaryDetailResponse createCombinedSummary(SummaryRequest request) {
         log.info("Starting combined AI synthesis for {} files inside folder ID: {}",
                 request.materialIds().size(),
                 request.folderId()
@@ -60,14 +60,16 @@ public class SummaryService {
 
         validateAiResponse(aiResponse);
 
-        saveAndReturnSummary(aiResponse, folder);
+        Summary savedSummary = saveAndReturnSummary(aiResponse, folder);
 
         log.info("Berhasil Membuat dan menyimpan Summary!");
 
-        return new SuccessResponse(
-                "Berhasil Membuat Summary",
-                new Date()
-        );
+        return SummaryDetailResponse.builder()
+                .id(savedSummary.getId())
+                .title(savedSummary.getTitle())
+                .keyPoint(savedSummary.getKeyPoints())
+                .content(savedSummary.getContent())
+                .build();
     }
 
     public SummaryDetailResponse getDetailSummary(UUID summaryId) {
@@ -97,9 +99,15 @@ public class SummaryService {
                 .orElseThrow(() -> new SummaryNotFoundException("Summary not found with ID: " + summaryId));
     }
 
-    public List<SummaryPreviewResponse> getListSummary(UUID folderId) {
+    public List<SummaryPreviewResponse> getListSummaryByFolder(UUID folderId) {
         List<Summary> summaries = summaryRepository.findSummaryByFoldersId(folderId);
         return buildListSummaryPreviewResponse(summaries);
+    }
+
+    public List<SummaryPreviewResponse> getAllListSummary(UUID userId) {
+        return buildListSummaryPreviewResponse(
+                summaryRepository.findAllByFoldersUserId(userId)
+        );
     }
 
     private List<SummaryPreviewResponse> buildListSummaryPreviewResponse(List<Summary> summaries) {
@@ -113,7 +121,7 @@ public class SummaryService {
                 .toList();
     }
 
-    private void saveAndReturnSummary(DocumentSummaryResponse response, Folders folder) {
+    private Summary saveAndReturnSummary(DocumentSummaryResponse response, Folders folder) {
         Summary summary = new Summary();
         summary.setTitle(response.title());
         summary.setPreview(response.preview());
@@ -121,7 +129,7 @@ public class SummaryService {
         summary.setContent(response.content());
         summary.setFolders(folder);
 
-        summaryRepository.save(summary);
+        return summaryRepository.saveAndFlush(summary);
     }
 
     private List<Content> combinePayload(List<UUID> materialIds) {

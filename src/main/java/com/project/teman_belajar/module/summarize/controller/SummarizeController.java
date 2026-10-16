@@ -1,12 +1,14 @@
 package com.project.teman_belajar.module.summarize.controller;
 
 import com.project.teman_belajar.module.auth.dto.response.SuccessResponse;
+import com.project.teman_belajar.module.auth.entities.Users;
 import com.project.teman_belajar.module.summarize.dto.request.SummaryRequest;
 import com.project.teman_belajar.module.summarize.dto.response.SummaryDetailResponse;
 import com.project.teman_belajar.module.summarize.dto.response.SummaryPreviewResponse;
 import com.project.teman_belajar.module.summarize.service.SummaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,7 +22,7 @@ public class SummarizeController {
     public final SummaryService summaryService;
 
     @PostMapping("/summarize")
-    public ResponseEntity<SuccessResponse> createSummary(
+    public ResponseEntity<SummaryDetailResponse> createSummary(
             @RequestBody SummaryRequest summaryRequest
     ) {
         return ResponseEntity.ok(
@@ -33,7 +35,16 @@ public class SummarizeController {
             @RequestParam UUID folderId
     ) {
         return ResponseEntity.ok(
-                summaryService.getListSummary(folderId)
+                summaryService.getListSummaryByFolder(folderId)
+        );
+    }
+
+    @GetMapping("/list-all")
+    public ResponseEntity<List<SummaryPreviewResponse>> getListAllSummary(
+            @AuthenticationPrincipal Users user
+    ) {
+        return ResponseEntity.ok(
+                summaryService.getAllListSummary(user.getId())
         );
     }
 

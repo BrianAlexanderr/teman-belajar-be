@@ -11,4 +11,6 @@ import java.util.UUID;
 public interface SummaryRepository extends JpaRepository<Summary, UUID> {
 
     List<Summary> findSummaryByFoldersId(UUID folderId);
+
+    List<Summary> findAllByFoldersUserId(UUID userId);
 }
